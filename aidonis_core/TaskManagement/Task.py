@@ -1,7 +1,7 @@
 import uuid
 from multiprocessing import Manager
 
-from GenAI import AssistantConnector, Sculptor
+from aidonis_core.GenAI import AssistantConnector, Sculptor
 
 
 class Task:
