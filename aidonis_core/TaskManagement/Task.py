@@ -5,7 +5,7 @@ from aidonis_core.GenAI import AssistantConnector, Sculptor
 
 
 class Task:
-    def __init__(self, prompt, file_url=None):
+    def __init__(self, prompt):
         """
         Task element is responsible for managing the task's status and running the process of generating a BPMN file.
         The <run> method is responsible for running the process and updating the status of the task. It is automatically
@@ -13,11 +13,9 @@ class Task:
         individually, you can call the <run> method directly.
 
         :param prompt: Prompt to be sent to the assistant
-        :param file_url: URL of the file to be used as output
         """
         self.id = uuid.uuid4()
         self.prompt = prompt
-        self.file_url = file_url
         manager = Manager()
         self.status = manager.dict()
         self.status[self.id] = "CREATED"
