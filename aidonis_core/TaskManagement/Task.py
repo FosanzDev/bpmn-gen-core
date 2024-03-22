@@ -38,19 +38,15 @@ class Task:
 
         self.status[self.id] = "GENERATING PROCESS"
         process = process_generator.generate_completion(self.prompt)
-        print("Process generated")
 
         self.status[self.id] = "GENERATING GRAPHIC"
         graphic = graphic_generator.generate_completion(process)
-        print("Graphic generated")
 
         self.status[self.id] = "REVIEWING"
         graphic_reviewed = reviewer.generate_completion(graphic)
-        print("Graphic reviewed")
 
         self.status[self.id] = "SCULPTING"
         bpmn_content = sculptor.sculpt(process, graphic_reviewed)
-        print("BPMN sculpted")
 
         self.status[self.id] = "COMPLETED"
         return bpmn_content
