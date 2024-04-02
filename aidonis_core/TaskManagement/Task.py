@@ -33,7 +33,6 @@ class Task:
         self.status[self.id] = "RUNNING"
         process_generator = AssistantConnector(api_key, assistants_base["PROCESS_GENERATOR"])
         graphic_generator = AssistantConnector(api_key, assistants_base["GRAPHIC_GENERATOR"])
-        reviewer = AssistantConnector(api_key, assistants_base["REVIEWER"])
         sculptor = Sculptor()
 
         self.status[self.id] = "GENERATING PROCESS"
@@ -42,11 +41,8 @@ class Task:
         self.status[self.id] = "GENERATING GRAPHIC"
         graphic = graphic_generator.generate_completion(process)
 
-        self.status[self.id] = "REVIEWING"
-        graphic_reviewed = reviewer.generate_completion(graphic)
-
         self.status[self.id] = "SCULPTING"
-        bpmn_content = sculptor.sculpt(process, graphic_reviewed)
+        bpmn_content = sculptor.sculpt(process, graphic)
 
         self.status[self.id] = "COMPLETED"
         return bpmn_content
@@ -58,7 +54,6 @@ class Task:
         - RUNNING
         - GENERATING PROCESS
         - GENERATING GRAPHIC
-        - REVIEWING
         - SCULPTING
         - COMPLETED
         :return: Status of the task

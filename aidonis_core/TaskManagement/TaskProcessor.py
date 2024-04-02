@@ -10,7 +10,7 @@ class TaskProcessor:
         """TaskProcessor class is responsible for managing generation tasks and running them in parallel.
         :param api_key: OpenAI API key
         :param assistants_base: dict containing the id of each assistant (related to the API key) as it follows:
-            {"PROCESS_GENERATOR": "<id1>", "GRAPHIC_GENERATOR": "<id2>", "REVIEWER": "<id3>"}
+            {"PROCESS_GENERATOR": "<id1>", "GRAPHIC_GENERATOR": "<id2>"}
 
         :param max_tasks: Maximum number of tasks to run in parallel
         :param notifier: TaskEndNotifier object, which can be inherited to create a custom response handler
