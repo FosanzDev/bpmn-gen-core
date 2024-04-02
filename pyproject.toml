@@ -3,9 +3,9 @@ requires = ["setuptools", "wheel", "poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "aidonis-core"
+name = "bpmn_gen_core"
 version = "0.1"
-description = "BOC ADONIS GenAI Core Functionality"
+description = "Asynchronous BPMN generator for Python with OpenAI Assistants"
 authors = ["Esteban Sánchez - FosanzDev <me@fosanz.dev>"]
 
 [tool.poetry.dependencies]

@@ -1,6 +1,6 @@
 # TaskManagement/TaskProcessor.py
-from aidonis_core.TaskManagement.TaskEndNotifier import TaskEndNotifier
-from aidonis_core.TaskManagement.Task import Task
+from bpmn_gen_core.TaskManagement.TaskEndNotifier import TaskEndNotifier
+from bpmn_gen_core.TaskManagement.Task import Task
 from multiprocessing import Pool
 import time
 
