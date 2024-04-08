@@ -37,7 +37,6 @@ class AssistantConnector:
         )
 
         while run.status in ['queued', 'in_progress', 'cancelling']:
-            print("Status: " + run.status)
             time.sleep(1)  # add a pause between checks
             run = self.client.beta.threads.runs.retrieve(
                 thread_id=self.thread.id,
@@ -46,7 +45,6 @@ class AssistantConnector:
 
         # Get the assistant's response
         if run.status == 'completed':
-            print("Assistant completed the task")
             messages = self.client.beta.threads.messages.list(
                 thread_id=self.thread.id
             )
@@ -58,8 +56,6 @@ class AssistantConnector:
                         return content.text.value
 
         else:
-            print("Assistant did not complete the task")
-            print("Error: " + run.status)
             # Return an error message
             return "Error: " + run.status
 
@@ -83,37 +79,24 @@ class AssistantConnector:
         )
 
         if kwargs:
-            print("Additional tweaking information:")
-            print(kwargs)
             string = ""
             for key, value in kwargs.items():
                 # Send additional tweaking information to the assistant
                 string += f"{key}={value}\n"
-
-            print("Additional tweaking information string:")
-            print(string)
 
             self.client.beta.threads.messages.create(
                 thread_id=self.thread.id,
                 role="user",
                 content=string
             )
-
-            print("Additional tweaking information sent to the assistant")
-
-        print("Prompt sent to the assistant")
-
         # Run the assistant
         run = self.client.beta.threads.runs.create(
             thread_id=self.thread.id,
             assistant_id=self.assistant_id
         )
 
-        print("Assistant is running")
-
         # Wait for the assistant to complete the task
         while run.status in ['queued', 'in_progress', 'cancelling']:
-            print("Status: " + run.status)
             time.sleep(1)  # add a pause between checks
             run = self.client.beta.threads.runs.retrieve(
                 thread_id=self.thread.id,
@@ -122,7 +105,6 @@ class AssistantConnector:
 
         # Get the assistant's response
         if run.status == 'completed':
-            print("Assistant completed the task")
             messages = self.client.beta.threads.messages.list(
                 thread_id=self.thread.id
             )
@@ -134,7 +116,5 @@ class AssistantConnector:
                         return content.text.value
 
         else:
-            print("Assistant did not complete the task")
-            print("Error: " + run.status)
             # Return an error message
             return "Error: " + run.status
