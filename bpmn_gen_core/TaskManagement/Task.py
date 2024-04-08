@@ -5,7 +5,7 @@ from bpmn_gen_core.GenAI import AssistantConnector, Sculptor
 
 
 class Task:
-    def __init__(self, prompt):
+    def __init__(self, prompt, extras: dict = None):
         """
         Task element is responsible for managing the task's status and running the process of generating a BPMN file.
         The <run> method is responsible for running the process and updating the status of the task. It is automatically
@@ -16,6 +16,7 @@ class Task:
         """
         self.id = uuid.uuid4()
         self.prompt = prompt
+        self.extras = extras
         manager = Manager()
         self.status = manager.dict()
         self.status[self.id] = "CREATED"
@@ -36,10 +37,11 @@ class Task:
         sculptor = Sculptor()
 
         self.status[self.id] = "GENERATING PROCESS"
-        process = process_generator.generate_completion(self.prompt)
+        process = process_generator.generate_completion(self.prompt, **self.extras)
 
         self.status[self.id] = "GENERATING GRAPHIC"
-        graphic = graphic_generator.generate_completion(process)
+        thread = process_generator.get_thread_id()
+        graphic = graphic_generator.continue_thread(thread)
 
         self.status[self.id] = "SCULPTING"
         bpmn_content = sculptor.sculpt(process, graphic)
