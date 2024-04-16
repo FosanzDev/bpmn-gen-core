@@ -5,7 +5,7 @@ from bpmn_gen_core.GenAI import AssistantConnector, Sculptor
 
 
 class Task:
-    def __init__(self, prompt, extras: dict = None):
+    def __init__(self, prompt, filename=None, extras: dict = None):
         """
         Task element is responsible for managing the task's status and running the process of generating a BPMN file.
         The <run> method is responsible for running the process and updating the status of the task. It is automatically
@@ -16,6 +16,7 @@ class Task:
         """
         self.id = uuid.uuid4()
         self.prompt = prompt
+        self.filename = filename
         self.extras = extras
         manager = Manager()
         self.status = manager.dict()
@@ -28,7 +29,7 @@ class Task:
         will need to provide the api_key and assistants_base as parameters.
         :param api_key: OpenAI API key
         :param assistants_base: dict containing the id of each assistant (related to the API key) as it follows:
-        {"PROCESS_GENERATOR": "<id1>", "GRAPHIC_GENERATOR": "<id2>", "REVIEWER": "<id3>"}
+        {"PROCESS_GENERATOR": "<id1>", "GRAPHIC_GENERATOR": "<id2>"}
         :return: BPMN file content as a string
         """
         self.status[self.id] = "RUNNING"
@@ -37,7 +38,7 @@ class Task:
         sculptor = Sculptor()
 
         self.status[self.id] = "GENERATING PROCESS"
-        process = process_generator.generate_completion(self.prompt, **self.extras)
+        process = process_generator.generate_completion(self.prompt, file=self.filename, **self.extras)
 
         self.status[self.id] = "GENERATING GRAPHIC"
         thread = process_generator.get_thread_id()

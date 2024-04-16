@@ -59,8 +59,7 @@ class AssistantConnector:
             # Return an error message
             return "Error: " + run.status
 
-
-    def generate_completion(self, prompt, **kwargs: dict):
+    def generate_completion(self, prompt, file=None, **kwargs: dict):
         """
         Send a request to the assistant to generate a completion based on the given prompt.
         :param prompt:  The prompt to be sent to the assistant
@@ -69,14 +68,29 @@ class AssistantConnector:
         """
 
         # Create a new thread for the assistant
+        global ass_file
         self.thread = self.client.beta.threads.create()
 
-        # Send the prompt to the assistant
-        self.client.beta.threads.messages.create(
-            thread_id=self.thread.id,
-            role="user",
-            content=prompt
-        )
+        if file:
+            ass_file = self.client.files.create(
+                file=open(file, "rb"),
+                purpose='assistants'
+            )
+
+            self.client.beta.threads.messages.create(
+                thread_id=self.thread.id,
+                role="user",
+                content="(File retrieval needed)",
+                file_ids=[ass_file.id]
+            )
+
+        else:
+            # Send the prompt to the assistant
+            self.client.beta.threads.messages.create(
+                thread_id=self.thread.id,
+                role="user",
+                content=prompt
+            )
 
         if kwargs:
             string = ""
@@ -107,6 +121,10 @@ class AssistantConnector:
         if run.status == 'completed':
             messages = self.client.beta.threads.messages.list(
                 thread_id=self.thread.id
+            )
+
+            file_deletion = self.client.files.delete(
+                file_id=ass_file.id
             )
 
             for message in messages.data:
