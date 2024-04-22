@@ -36,4 +36,6 @@ class Sculptor:
         :param graphic: generated graphic
         :return: BPMN file
         """
-        return XML_HEADER + DEFINITIONS_TAG + process + graphic + "</definitions>"
+        process = process.replace("```xml", "").replace("```", "")
+        graphic = graphic.replace("```xml", "").replace("```", "")
+        return XML_HEADER + DEFINITIONS_TAG + process + "\n" + graphic + "\n</definitions>"

@@ -31,21 +31,18 @@ class AssistantConnector:
         :param thread: Thread ID to be continued
         """
         self.thread = self.client.beta.threads.retrieve(thread)
-        run = self.client.beta.threads.runs.create(
+        run = self.client.beta.threads.runs.create_and_poll(
             thread_id=self.thread.id,
             assistant_id=self.assistant_id
         )
 
-        while run.status in ['queued', 'in_progress', 'cancelling']:
-            time.sleep(1)  # add a pause between checks
-            run = self.client.beta.threads.runs.retrieve(
-                thread_id=self.thread.id,
-                run_id=run.id
-            )
-
         # Get the assistant's response
         if run.status == 'completed':
             messages = self.client.beta.threads.messages.list(
+                thread_id=self.thread.id
+            )
+
+            self.client.beta.threads.delete(
                 thread_id=self.thread.id
             )
 
@@ -71,26 +68,6 @@ class AssistantConnector:
         global ass_file
         self.thread = self.client.beta.threads.create()
 
-        if file:
-            ass_file = self.client.files.create(
-                file=open(file, "rb"),
-                purpose='assistants'
-            )
-
-            self.client.beta.threads.messages.create(
-                thread_id=self.thread.id,
-                role="user",
-                content="(File retrieval needed)",
-                file_ids=[ass_file.id]
-            )
-
-        else:
-            # Send the prompt to the assistant
-            self.client.beta.threads.messages.create(
-                thread_id=self.thread.id,
-                role="user",
-                content=prompt
-            )
 
         if kwargs:
             string = ""
@@ -103,28 +80,45 @@ class AssistantConnector:
                 role="user",
                 content=string
             )
+
+        if file:
+
+            ass_file = self.client.files.create(
+                file=open(file, "rb"),
+                purpose="assistants"
+            )
+
+            self.client.beta.threads.messages.create(
+                thread_id=self.thread.id,
+                role="user",
+                content="Generate process with attached file as requirements",
+                attachments=[
+                    {"file_id": ass_file.id, "tools": [{"type": "file_search"}]}
+                ]
+            )
+
+        else:
+            # Send the prompt to the assistant
+            self.client.beta.threads.messages.create(
+                thread_id=self.thread.id,
+                role="user",
+                content=prompt
+            )
+
+
+
+
         # Run the assistant
-        run = self.client.beta.threads.runs.create(
+        run = self.client.beta.threads.runs.create_and_poll(
             thread_id=self.thread.id,
             assistant_id=self.assistant_id
         )
 
-        # Wait for the assistant to complete the task
-        while run.status in ['queued', 'in_progress', 'cancelling']:
-            time.sleep(1)  # add a pause between checks
-            run = self.client.beta.threads.runs.retrieve(
-                thread_id=self.thread.id,
-                run_id=run.id
-            )
-
         # Get the assistant's response
         if run.status == 'completed':
             messages = self.client.beta.threads.messages.list(
-                thread_id=self.thread.id
-            )
-
-            file_deletion = self.client.files.delete(
-                file_id=ass_file.id
+                thread_id=self.thread.id,
+                run_id=run.id
             )
 
             for message in messages.data:
